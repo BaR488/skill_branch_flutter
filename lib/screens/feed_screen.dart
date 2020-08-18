@@ -50,6 +50,8 @@ class _FeedState extends State<Feed> {
                       altDescription: description,
                       name: name,
                       userName: userName,
+                      avatar: kFlutterDash,
+                      photo: kFlutterDash,
                     )));
       },
       child: Column(

@@ -5,16 +5,20 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 
-const String kFlutterDash =
-    'https://flutter.dev/assets/404/dash_nest-c64796b59b65042a2b40fae5764c13b7477a592db79eaf04c86298dcb75b78ea.png';
-
 class FullScreenImage extends StatefulWidget {
   final String altDescription;
   final String userName;
   final String name;
+  final String photo;
+  final String avatar;
 
   const FullScreenImage(
-      {Key key, this.altDescription = '', this.userName = '', this.name = ''})
+      {Key key,
+      this.photo = '',
+      this.avatar = '',
+      this.altDescription = '',
+      this.userName = '',
+      this.name = ''})
       : super(key: key);
 
   @override
@@ -25,6 +29,8 @@ class _FullScreenImageState extends State<FullScreenImage> {
   String altDescription;
   String userName;
   String name;
+  String photo;
+  String avatar;
 
   @override
   void initState() {
@@ -32,7 +38,10 @@ class _FullScreenImageState extends State<FullScreenImage> {
     this.name = widget.name;
     this.userName = widget.userName;
     this.altDescription = widget.altDescription;
+    this.photo = widget.photo;
+    this.avatar = widget.avatar;
   }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -52,7 +61,7 @@ class _FullScreenImageState extends State<FullScreenImage> {
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Photo(photoLink: kFlutterDash),
+          Photo(photoLink: photo),
           Padding(
             padding: EdgeInsets.symmetric(horizontal: 10, vertical: 5),
             child: Text(
@@ -76,7 +85,7 @@ class _FullScreenImageState extends State<FullScreenImage> {
         Row(
           children: [
             UserAvatar(
-              avatarLink: kFlutterDash,
+              avatarLink: avatar,
             ),
             SizedBox(
               width: 6,
