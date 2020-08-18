@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import 'screens/feed_screen.dart';
+import 'screens/photo_screen.dart';
 
 class MyApp extends StatelessWidget {
   @override
@@ -12,7 +13,7 @@ class MyApp extends StatelessWidget {
         primarySwatch: Colors.blue,
         visualDensity: VisualDensity.adaptivePlatformDensity,
       ),
-      home: Feed(),
+      home: FullScreenImage(),
     );
   }
 }

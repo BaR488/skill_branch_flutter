@@ -51,7 +51,7 @@ class _FeedState extends State<Feed> {
             'This is Flutter Dash!!! I love him ;) ',
             maxLines: 3,
             overflow: TextOverflow.ellipsis,
-            style: AppStyles.h3.copyWith(color: AppColors.black),
+            style: AppStyles.h3,
           ),
         )
       ],
