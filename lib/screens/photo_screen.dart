@@ -1,6 +1,7 @@
 import 'package:FlutterGalleryApp/res/res.dart';
 import 'package:FlutterGalleryApp/widgets/photo.dart';
 import 'package:FlutterGalleryApp/widgets/widgets.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 
@@ -13,7 +14,7 @@ class FullScreenImage extends StatefulWidget {
   final String name;
 
   const FullScreenImage(
-      {Key key, this.altDescription, this.userName, this.name})
+      {Key key, this.altDescription = '', this.userName = '', this.name = ''})
       : super(key: key);
 
   @override
@@ -21,6 +22,17 @@ class FullScreenImage extends StatefulWidget {
 }
 
 class _FullScreenImageState extends State<FullScreenImage> {
+  String altDescription;
+  String userName;
+  String name;
+
+  @override
+  void initState() {
+    super.initState();
+    this.name = widget.name;
+    this.userName = widget.userName;
+    this.altDescription = widget.altDescription;
+  }
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -33,7 +45,7 @@ class _FullScreenImageState extends State<FullScreenImage> {
         ),
         elevation: 0.0,
         leading: IconButton(
-          icon: Icon(Icons.arrow_back_ios, color: AppColors.grayChateau),
+          icon: Icon(CupertinoIcons.back, color: AppColors.grayChateau),
           onPressed: () => Navigator.of(context).pop(),
         ),
       ),
@@ -44,7 +56,7 @@ class _FullScreenImageState extends State<FullScreenImage> {
           Padding(
             padding: EdgeInsets.symmetric(horizontal: 10, vertical: 5),
             child: Text(
-              'This is Flutter Dash!!! I love him ;) ',
+              altDescription,
               maxLines: 3,
               overflow: TextOverflow.ellipsis,
               style: AppStyles.h3,
@@ -74,11 +86,11 @@ class _FullScreenImageState extends State<FullScreenImage> {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text(
-                  'Name Name',
+                  name,
                   style: AppStyles.h2Black,
                 ),
                 Text(
-                  '@name',
+                  '@$userName',
                   style: AppStyles.h5Black.copyWith(color: AppColors.manatee),
                 )
               ],
