@@ -86,7 +86,7 @@ class _FeedState extends State<Feed> {
             )
           ],
         ),
-        LikeButton(10, true)
+        LikeButton(likeCount: 10, isLiked: true)
       ]),
     );
   }

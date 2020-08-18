@@ -6,7 +6,7 @@ class LikeButton extends StatefulWidget {
   final int likeCount;
   final bool isLiked;
 
-  const LikeButton(this.likeCount, this.isLiked, {Key key});
+  const LikeButton({Key key, this.likeCount, this.isLiked});
 
   @override
   _LikeButtonState createState() => _LikeButtonState();
