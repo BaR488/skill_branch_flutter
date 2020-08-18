@@ -5,6 +5,8 @@ import 'package:FlutterGalleryApp/widgets/widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 
+import 'photo_screen.dart';
+
 const String kFlutterDash =
     'https://flutter.dev/assets/404/dash_nest-c64796b59b65042a2b40fae5764c13b7477a592db79eaf04c86298dcb75b78ea.png';
 
@@ -26,7 +28,8 @@ class _FeedState extends State<Feed> {
           itemBuilder: (BuildContext context, int index) {
             return Column(
               children: [
-                _buildItem(),
+                _buildItem('This is Flutter Dash!!! I love him ;) ',
+                    'Name Name', 'userName'),
                 Divider(
                   thickness: 2,
                   color: AppColors.mercury,
@@ -37,28 +40,40 @@ class _FeedState extends State<Feed> {
     );
   }
 
-  Widget _buildItem() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Photo(
-          photoLink: kFlutterDash,
-        ),
-        _buildPhotoMeta(),
-        Padding(
-          padding: EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-          child: Text(
-            'This is Flutter Dash!!! I love him ;) ',
-            maxLines: 3,
-            overflow: TextOverflow.ellipsis,
-            style: AppStyles.h3,
+  Widget _buildItem(String description, String name, String userName) {
+    return GestureDetector(
+      onTap: () {
+        Navigator.push(
+            context,
+            MaterialPageRoute(
+                builder: (context) => FullScreenImage(
+                      altDescription: description,
+                      name: name,
+                      userName: userName,
+                    )));
+      },
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Photo(
+            photoLink: kFlutterDash,
           ),
-        )
-      ],
+          _buildPhotoMeta(name, userName),
+          Padding(
+            padding: EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+            child: Text(
+              description,
+              maxLines: 3,
+              overflow: TextOverflow.ellipsis,
+              style: AppStyles.h3,
+            ),
+          )
+        ],
+      ),
     );
   }
 
-  Widget _buildPhotoMeta() {
+  Widget _buildPhotoMeta(String name, String userName) {
     return Padding(
       padding: EdgeInsets.symmetric(horizontal: 10, vertical: 5),
       child: Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
@@ -75,11 +90,11 @@ class _FeedState extends State<Feed> {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text(
-                  'Name Name',
+                  name,
                   style: AppStyles.h2Black,
                 ),
                 Text(
-                  '@name',
+                  userName,
                   style: AppStyles.h5Black.copyWith(color: AppColors.manatee),
                 )
               ],
