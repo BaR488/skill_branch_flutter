@@ -1,3 +1,4 @@
+import 'package:FlutterGalleryApp/screens/home.dart';
 import 'package:flutter/material.dart';
 
 import 'screens/feed_screen.dart';
@@ -13,7 +14,7 @@ class MyApp extends StatelessWidget {
         primarySwatch: Colors.blue,
         visualDensity: VisualDensity.adaptivePlatformDensity,
       ),
-      home: Feed(),
+      home: Home(),
     );
   }
 }
