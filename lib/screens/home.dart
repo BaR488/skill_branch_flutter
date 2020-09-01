@@ -9,85 +9,97 @@ class Home extends StatefulWidget {
   _HomeState createState() => _HomeState();
 }
 
-class _HomeState extends State<Home> {
+class _HomeState extends State<Home> with TickerProviderStateMixin {
+  int currentTab = 0;
+  final PageStorageBucket bucket = PageStorageBucket();
 
   List<Widget> pages = [
-    Feed(),
+    Feed(
+      key: PageStorageKey('FeedPage'),
+    ),
     Container(),
     Container()
   ];
 
-  int currentTab = 0;
+  final List<BottomNavyBarItem> _tabs = [
+    BottomNavyBarItem(
+        asset: AppIcons.home,
+        title: Text('Feed'),
+        activeColor: AppColors.dodgerBlue,
+        inactiveColor: AppColors.manatee),
+    BottomNavyBarItem(
+        asset: AppIcons.home,
+        title: Text('Search'),
+        activeColor: AppColors.dodgerBlue,
+        inactiveColor: AppColors.manatee),
+    BottomNavyBarItem(
+        asset: AppIcons.home,
+        title: Text('User'),
+        activeColor: AppColors.dodgerBlue,
+        inactiveColor: AppColors.manatee)
+  ];
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       bottomNavigationBar: BottomNavyBar(
+        showElevation: true,
         itemCornerRadius: 8,
         curve: Curves.ease,
+        items: _tabs,
+        currentTab: currentTab,
         onItemSelected: (int index) {
           setState(() {
             currentTab = index;
           });
         },
-        currentTab: currentTab,
-        items: [
-          BottomNavyBarItem(
-              asset: AppIcons.home,
-              title: Text('Feed'),
-              activeColor: AppColors.dodgerBlue,
-              inactiveColor: AppColors.manatee),
-          BottomNavyBarItem(
-              asset: AppIcons.home,
-              title: Text('Search'),
-              activeColor: AppColors.dodgerBlue,
-              inactiveColor: AppColors.manatee),
-          BottomNavyBarItem(
-              asset: AppIcons.home,
-              title: Text('User'),
-              activeColor: AppColors.dodgerBlue,
-              inactiveColor: AppColors.manatee)
-        ],
       ),
-      body: pages[currentTab],
+      body: PageStorage(
+        child: pages[currentTab],
+        bucket: bucket,
+      ),
     );
   }
 }
 
 class BottomNavyBar extends StatelessWidget {
-  final Color backgroundColor;
-  final bool showElevation;
-  final double containerHeight;
-
-  final List<BottomNavyBarItem> items;
-
-  final MainAxisAlignment mainAxisAlignment;
-
-  final ValueChanged<int> onItemSelected;
-
-  final int currentTab;
-  final Duration animationDuration;
-  final double itemCornerRadius;
-  final Curve curve;
-
   BottomNavyBar({
     Key key,
-    this.backgroundColor = Colors.white,
-    this.showElevation = true,
-    this.containerHeight = 56,
-    this.mainAxisAlignment = MainAxisAlignment.spaceBetween,
-    this.items,
-    this.onItemSelected,
     this.currentTab,
+    this.showElevation = true,
+    this.backgroundColor = Colors.white,
+    this.itemCornerRadius = 50,
+    this.containerHeight = 56,
     this.animationDuration = const Duration(milliseconds: 270),
-    this.itemCornerRadius = 24,
-    this.curve,
-  }) : super(key: key);
+    this.mainAxisAlignment = MainAxisAlignment.spaceBetween,
+    @required this.items,
+    @required this.onItemSelected,
+    this.curve = Curves.linear,
+  })  : assert(items != null),
+        assert(items.length >= 2 && items.length <= 5),
+        assert(onItemSelected != null),
+        assert(curve != null),
+        super(key: key);
+
+  final Color backgroundColor;
+  final bool showElevation;
+  final Duration animationDuration;
+  final List<BottomNavyBarItem> items;
+  final ValueChanged<int> onItemSelected;
+  final MainAxisAlignment mainAxisAlignment;
+  final double itemCornerRadius;
+  final double containerHeight;
+  final Curve curve;
+  final int currentTab;
 
   @override
   Widget build(BuildContext context) {
+    final bgColor = (backgroundColor == null)
+        ? Theme.of(context).backgroundColor
+        : backgroundColor;
+
     return Container(
-      decoration: BoxDecoration(color: backgroundColor, boxShadow: [
+      decoration: BoxDecoration(color: bgColor, boxShadow: [
         if (showElevation) const BoxShadow(color: Colors.black12, blurRadius: 2)
       ]),
       child: SafeArea(
@@ -99,14 +111,15 @@ class BottomNavyBar extends StatelessWidget {
             mainAxisAlignment: mainAxisAlignment,
             children: items.map((item) {
               var index = items.indexOf(item);
+
               return GestureDetector(
                 onTap: () => onItemSelected(index),
                 child: _ItemWidget(
-                  animationDuration: animationDuration,
                   item: item,
-                  backgroundColor: backgroundColor,
                   isSelected: currentTab == index,
+                  backgroundColor: bgColor,
                   itemCornerRadius: itemCornerRadius,
+                  animationDuration: animationDuration,
                   curve: curve,
                 ),
               );
@@ -119,77 +132,80 @@ class BottomNavyBar extends StatelessWidget {
 }
 
 class _ItemWidget extends StatelessWidget {
-  final bool isSelected;
-  final BottomNavyBarItem item;
-  final Color backgroundColor;
-  final Duration animationDuration;
-  final Curve curve;
-  final double itemCornerRadius;
-
   const _ItemWidget(
       {Key key,
-      @required this.isSelected,
       @required this.item,
+      @required this.isSelected,
       @required this.backgroundColor,
       @required this.animationDuration,
       this.curve = Curves.linear,
       @required this.itemCornerRadius})
-      : assert(animationDuration != null, 'animationDuration is null'),
-        assert(isSelected != null, 'isSelected is null'),
+      : assert(isSelected != null, 'isSelected is null'),
         assert(item != null, 'item is null'),
         assert(backgroundColor != null, 'backgroundColor is null'),
+        assert(animationDuration != null, 'animationDuration is null'),
         assert(itemCornerRadius != null, 'itemCornerRadius is null'),
         super(key: key);
+
+  final bool isSelected;
+  final BottomNavyBarItem item;
+  final Color backgroundColor;
+  final double itemCornerRadius;
+  final Duration animationDuration;
+  final Curve curve;
 
   @override
   Widget build(BuildContext context) {
     return AnimatedContainer(
-      duration: animationDuration,
       width: isSelected
           ? 150
           : (MediaQuery.of(context).size.width - 150 - 8 * 4 - 4 * 2) / 2,
+      height: double.maxFinite,
+      duration: animationDuration,
       curve: curve,
-      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 12),
       decoration: BoxDecoration(
           color:
               isSelected ? item.activeColor.withOpacity(0.2) : backgroundColor,
-
           borderRadius: BorderRadius.circular(itemCornerRadius)),
-      child: Row(
-        children: [
-          Icon(
-            item.asset,
-            size: 20,
-            color: isSelected ? item.activeColor : item.inactiveColor,
-          ),
-          SizedBox(
-            width: 4,
-          ),
-          Expanded(
-            child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 4),
-              child: DefaultTextStyle.merge(
-                  child: item.title,
-                  textAlign: item.textAlign,
-                  maxLines: 1,
+      child: Container(
+        width: isSelected
+            ? 150
+            : (MediaQuery.of(context).size.width - 150 - 8 * 4 - 4 * 2) / 2,
+        padding: const EdgeInsets.symmetric(horizontal: 8),
+        child: Row(
+          mainAxisSize: MainAxisSize.max,
+          mainAxisAlignment: MainAxisAlignment.start,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            Icon(
+              item.asset,
+              size: 20,
+              color: isSelected ? item.activeColor : item.inactiveColor,
+            ),
+            SizedBox(
+              width: 4,
+            ),
+            Expanded(
+              child: Container(
+                padding: const EdgeInsets.symmetric(horizontal: 4),
+                child: DefaultTextStyle.merge(
                   style: TextStyle(
                       color: isSelected ? item.activeColor : item.inactiveColor,
-                      fontWeight: FontWeight.bold)),
-            ),
-          )
-        ],
+                      fontWeight: FontWeight.bold),
+                  maxLines: 1,
+                  textAlign: item.textAlign,
+                  child: item.title,
+                ),
+              ),
+            )
+          ],
+        ),
       ),
     );
   }
 }
 
 class BottomNavyBarItem {
-  final IconData asset;
-  final Text title;
-  final Color activeColor;
-  final Color inactiveColor;
-  final TextAlign textAlign;
-
   BottomNavyBarItem(
       {this.asset,
       this.title,
@@ -199,4 +215,10 @@ class BottomNavyBarItem {
     assert(asset != null, 'Asset is null');
     assert(title != null, 'Title is null');
   }
+
+  final IconData asset;
+  final Text title;
+  final Color activeColor;
+  final Color inactiveColor;
+  final TextAlign textAlign;
 }

@@ -29,7 +29,7 @@ class _FeedState extends State<Feed> {
             return Column(
               children: [
                 _buildItem('This is Flutter Dash!!! I love him ;) ',
-                    'Name Name', 'userName'),
+                    'Name Name', 'userName', index),
                 Divider(
                   thickness: 2,
                   color: AppColors.mercury,
@@ -40,25 +40,30 @@ class _FeedState extends State<Feed> {
     );
   }
 
-  Widget _buildItem(String description, String name, String userName) {
+  Widget _buildItem(
+      String description, String name, String userName, num index) {
+    final String heroTag = 'photo-id-$index';
     return GestureDetector(
       onTap: () {
         Navigator.push(
             context,
             MaterialPageRoute(
                 builder: (context) => FullScreenImage(
-                      altDescription: description,
-                      name: name,
-                      userName: userName,
-                      avatar: kFlutterDash,
-                      photo: kFlutterDash,
-                    )));
+                    altDescription: description,
+                    name: name,
+                    userName: userName,
+                    userPhoto: kFlutterDash,
+                    photo: kFlutterDash,
+                    heroTag: heroTag)));
       },
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Photo(
-            photoLink: kFlutterDash,
+          Hero(
+            tag: heroTag,
+            child: Photo(
+              photoLink: kFlutterDash,
+            ),
           ),
           _buildPhotoMeta(name, userName),
           Padding(
