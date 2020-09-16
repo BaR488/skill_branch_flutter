@@ -45,16 +45,15 @@ class _FeedState extends State<Feed> {
     final String heroTag = 'photo-id-$index';
     return GestureDetector(
       onTap: () {
-        Navigator.push(
-            context,
-            MaterialPageRoute(
-                builder: (context) => FullScreenImage(
-                    altDescription: description,
-                    name: name,
-                    userName: userName,
-                    userPhoto: kFlutterDash,
-                    photo: kFlutterDash,
-                    heroTag: heroTag)));
+        Navigator.pushNamed(context, '/fullScreenImage',
+            arguments: FullScreenImageArguments(
+                routeSettings: RouteSettings(arguments: 'Some Title'),
+                altDescription: description,
+                name: name,
+                userName: userName,
+                userPhoto: kFlutterDash,
+                photo: kFlutterDash,
+                heroTag: heroTag));
       },
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -72,7 +71,7 @@ class _FeedState extends State<Feed> {
               description,
               maxLines: 3,
               overflow: TextOverflow.ellipsis,
-              style: AppStyles.h3,
+              style: Theme.of(context).textTheme.headline3,
             ),
           )
         ],
@@ -98,11 +97,11 @@ class _FeedState extends State<Feed> {
               children: [
                 Text(
                   name,
-                  style: AppStyles.h2Black,
+                  style: Theme.of(context).textTheme.headline2,
                 ),
                 Text(
                   userName,
-                  style: AppStyles.h5Black.copyWith(color: AppColors.manatee),
+                  style: Theme.of(context).textTheme.headline5.copyWith(color: AppColors.manatee),
                 )
               ],
             )

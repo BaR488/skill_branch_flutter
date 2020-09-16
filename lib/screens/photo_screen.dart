@@ -3,6 +3,29 @@ import 'package:FlutterGalleryApp/widgets/widgets.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
+import 'package:gallery_saver/gallery_saver.dart';
+
+class FullScreenImageArguments {
+  FullScreenImageArguments(
+      {this.routeSettings,
+      this.altDescription,
+      this.userName,
+      this.name,
+      this.photo,
+      this.userPhoto,
+      this.heroTag,
+      this.key});
+
+  final String altDescription;
+  final String userName;
+  final String name;
+  final String photo;
+  final String userPhoto;
+  final String heroTag;
+  final Key key;
+
+  final RouteSettings routeSettings;
+}
 
 class FullScreenImage extends StatefulWidget {
   final String altDescription;
@@ -12,13 +35,14 @@ class FullScreenImage extends StatefulWidget {
   final String userPhoto;
   final String heroTag;
 
-  const FullScreenImage({Key key,
-    this.photo = '',
-    this.userPhoto = '',
-    this.altDescription = '',
-    this.userName = '',
-    this.name = '',
-    this.heroTag = 'defaultPhotoHeroTag'})
+  const FullScreenImage(
+      {Key key,
+      this.photo = '',
+      this.userPhoto = '',
+      this.altDescription = '',
+      this.userName = '',
+      this.name = '',
+      this.heroTag = 'defaultPhotoHeroTag'})
       : super(key: key);
 
   @override
@@ -52,7 +76,7 @@ class _FullScreenImageState extends State<FullScreenImage>
     _controller = AnimationController(
         duration: const Duration(milliseconds: 1500), vsync: this);
 
-    avatarOpacity =  Tween<double>(
+    avatarOpacity = Tween<double>(
       begin: 0.0,
       end: 1.0,
     ).animate(
@@ -66,7 +90,7 @@ class _FullScreenImageState extends State<FullScreenImage>
       ),
     );
 
-    userNameOpacity =  Tween<double>(
+    userNameOpacity = Tween<double>(
       begin: 0.0,
       end: 1.0,
     ).animate(
@@ -85,13 +109,32 @@ class _FullScreenImageState extends State<FullScreenImage>
 
   @override
   Widget build(BuildContext context) {
+    String title = ModalRoute.of(context).settings.arguments;
     return Scaffold(
       backgroundColor: AppColors.white,
       appBar: AppBar(
         backgroundColor: AppColors.white,
+        actions: [
+          IconButton(
+            icon: Icon(Icons.more_vert, color: AppColors.grayChateau),
+            onPressed: () => {
+              showModalBottomSheet(
+                context: context,
+                builder: (context) {
+                  return Container(
+                      height: MediaQuery.of(context).size.height * (0.4),
+                      child: ClaimBottomSheet());
+                },
+              )
+            },
+          ),
+        ],
         title: Text(
           'Photo',
-          style: AppStyles.h2Black.copyWith(fontWeight: FontWeight.w500),
+          style: Theme.of(context)
+              .textTheme
+              .headline2
+              .copyWith(fontWeight: FontWeight.w500),
         ),
         elevation: 0.0,
         leading: IconButton(
@@ -114,7 +157,7 @@ class _FullScreenImageState extends State<FullScreenImage>
               altDescription,
               maxLines: 3,
               overflow: TextOverflow.ellipsis,
-              style: AppStyles.h3,
+              style: Theme.of(context).textTheme.headline3,
             ),
           ),
           _buildPhotoMeta(),
@@ -154,11 +197,14 @@ class _FullScreenImageState extends State<FullScreenImage>
                 children: [
                   Text(
                     name,
-                    style: AppStyles.h2Black,
+                    style: Theme.of(context).textTheme.headline2,
                   ),
                   Text(
                     '@$userName',
-                    style: AppStyles.h5Black.copyWith(color: AppColors.manatee),
+                    style: Theme.of(context)
+                        .textTheme
+                        .headline5
+                        .copyWith(color: AppColors.manatee),
                   )
                 ],
               ),
@@ -167,6 +213,10 @@ class _FullScreenImageState extends State<FullScreenImage>
         },
       ),
     );
+  }
+
+  Future<bool> _saveNetworkImage(path) async {
+    return GallerySaver.saveImage(path);
   }
 
   Widget _buildPhotoControls() {
@@ -190,16 +240,40 @@ class _FullScreenImageState extends State<FullScreenImage>
           child: Padding(
             padding: EdgeInsets.symmetric(horizontal: 6, vertical: 0),
             child: _buildButton('Save', () {
-              // TODO: do save
               print('save');
+              showDialog(
+                context: context,
+                builder: (context) {
+                  return AlertDialog(
+                    title: Text('Download photos'),
+                    content: Text('Are you sure you want to download a photo?'),
+                    actions: [
+                      FlatButton(
+                          onPressed: () {
+                            _saveNetworkImage(photo)
+                                .then((bool saved) => print(
+                                    saved ? 'Image saved' : 'Image NOT saved'))
+                                .catchError((e) => print('Image save ERROR'))
+                                .whenComplete(
+                                    () => Navigator.of(context).pop());
+                          },
+                          child: Text('Download')),
+                      FlatButton(
+                          onPressed: () {
+                            Navigator.of(context).pop();
+                          },
+                          child: Text('Close'))
+                    ],
+                  );
+                },
+              );
             }),
           ),
         ),
         Expanded(
           child: Padding(
             padding: EdgeInsets.symmetric(horizontal: 6, vertical: 0),
-            child: _buildButton('Visit', () {
-              // TODO: do visit
+            child: _buildButton('Visit', () async {
               print('visit');
             }),
           ),
@@ -208,7 +282,7 @@ class _FullScreenImageState extends State<FullScreenImage>
     );
   }
 
-  Widget _buildButton(String name, Function callback) {
+  Widget _buildButton(String name, VoidCallback callback) {
     return GestureDetector(
       onTap: () {
         callback();
@@ -219,10 +293,13 @@ class _FullScreenImageState extends State<FullScreenImage>
           color: AppColors.dodgerBlue,
           child: Center(
               child: Text(
-                name,
-                textAlign: TextAlign.center,
-                style: AppStyles.h4.copyWith(color: AppColors.white),
-              )),
+            name,
+            textAlign: TextAlign.center,
+            style: Theme.of(context)
+                .textTheme
+                .headline4
+                .copyWith(color: AppColors.white),
+          )),
           height: 36,
           width: 105,
         ),
