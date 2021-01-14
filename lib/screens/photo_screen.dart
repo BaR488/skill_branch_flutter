@@ -1,9 +1,14 @@
+import 'dart:typed_data';
+
 import 'package:FlutterGalleryApp/res/res.dart';
 import 'package:FlutterGalleryApp/widgets/widgets.dart';
+import 'package:dio/dio.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
-import 'package:gallery_saver/gallery_saver.dart';
+import 'package:image_gallery_saver/image_gallery_saver.dart';
+import 'package:permission_handler/permission_handler.dart';
+// import 'package:gallery_saver/gallery_saver.dart';
 
 class FullScreenImageArguments {
   FullScreenImageArguments(
@@ -216,7 +221,26 @@ class _FullScreenImageState extends State<FullScreenImage>
   }
 
   Future<bool> _saveNetworkImage(path) async {
-    return GallerySaver.saveImage(path);
+    var response =
+        Dio().get(path, options: Options(responseType: ResponseType.bytes));
+
+    var isGranted = Permission.storage.isGranted;
+
+    if (!(await isGranted)) {
+      PermissionStatus result = await Permission.storage.request();
+      if (!result.isGranted) {
+        return false;
+      }
+    }
+
+    return ImageGallerySaver.saveImage(Uint8List.fromList((await response).data))
+        .then((value) {
+      print(value);
+      return value['isSuccess'] as bool;
+    }).catchError((e) {
+      print(e);
+      return false;
+    });
   }
 
   Widget _buildPhotoControls() {
@@ -253,7 +277,8 @@ class _FullScreenImageState extends State<FullScreenImage>
                             _saveNetworkImage(photo)
                                 .then((bool saved) => print(
                                     saved ? 'Image saved' : 'Image NOT saved'))
-                                .catchError((e) => print('Image save ERROR'))
+                                .catchError(
+                                    (e) => print('Image save ERROR: $e'))
                                 .whenComplete(
                                     () => Navigator.of(context).pop());
                           },
